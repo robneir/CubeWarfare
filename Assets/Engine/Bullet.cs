@@ -27,14 +27,13 @@ public class Bullet : MonoBehaviour
 	public void Set(Vector3 start, Vector3 end, Vector3 velocity)
 	{
 		line = GetComponent<LineRenderer> ();
-		startPos = start;
-		endPos = end;
 		this.velocity = velocity;
 		if(type == 0)
 		{
 			line.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
 			line.SetColors(Color.white, Color.yellow);
-			line.SetWidth(0.01f, 0.01f);
+			end += velocity * 2f;
+			line.SetWidth(0.05f, 0.05f);
 			line.SetPosition(0, start);
 			line.SetPosition(1, end);
 		}
@@ -42,10 +41,14 @@ public class Bullet : MonoBehaviour
 		{
 			line.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
 			line.SetColors(Color.blue, Color.cyan);
-			line.SetWidth(0.01f, 0.01f);
+			end += velocity * 4f;
+			line.SetWidth(0.1f, 0.1f);
 			line.SetPosition(0, start);
 			line.SetPosition(1, end);
 		}
+
+		startPos = start;
+		endPos = end;
 	}
 
 	void OnCollisionEnter(Collision c)

@@ -12,6 +12,8 @@ public class WeaponShoot : MonoBehaviour {
 
 	bool isFiring = false;
 	private AudioSource myAudioSource;
+	//because we cant have two noises playing at once
+	private AudioSource myCameraAudioSource;
 	public Image reticle;
 	GravityFPSWalker gfps;
 
@@ -22,7 +24,17 @@ public class WeaponShoot : MonoBehaviour {
 	private float FOVsprint;
 	private Animator animator;
 
-	
+	public AudioClip[] reloadingPhrases;
+	public AudioClip[] outOfAmmoPhrases;
+	int outOfAmmoTimer = 60 * 6;
+	int outOfAmmoReset = 60 * 6;
+	bool outOfAmmoPlayed = false;
+
+	[HideInInspector]
+	public Weapon[] weaponList;
+	private int weaponIndex = 0;
+	public Transform handHoldingWeapons;
+
 	public bool sprinting
 	{
 		get { return gfps.sprinting;}
@@ -39,6 +51,19 @@ public class WeaponShoot : MonoBehaviour {
 
 		interaction = GameObject.Find ("Canvas").transform.FindChild ("Interaction").GetComponent<Text> ();
 		myAudioSource = GetComponent<AudioSource> ();
+		myCameraAudioSource = transform.parent.GetComponent<AudioSource> ();
+
+		//weapon list
+		weaponList = handHoldingWeapons.GetComponentsInChildren<Weapon> ();
+
+		foreach(var w in weaponList)
+		{
+			w.gameObject.active = false;
+		}
+
+		weaponList [0].gameObject.active = true;
+		weaponIndex = 0;
+		ChangeWeapon ();
 	}
 	
 	// Update is called once per frame
@@ -56,6 +81,8 @@ public class WeaponShoot : MonoBehaviour {
 			gfps.SetZooming(zooming);
 		}
 
+		CheckChangeWeapons ();
+
 		if(weapon.Automatic)
 		{
 			if (Input.GetMouseButton (0)) 
@@ -69,6 +96,12 @@ public class WeaponShoot : MonoBehaviour {
 						FireBullet ();
 					else if (weapon.ammoStockpile > 0)
 						StartReloading();
+					else if(!outOfAmmoPlayed)
+					{
+						outOfAmmoPlayed = true;
+						myCameraAudioSource.clip = outOfAmmoPhrases [Random.Range (0, outOfAmmoPhrases.Length)];
+						myCameraAudioSource.Play ();
+					}
 				} 
 			}
 			else
@@ -84,6 +117,12 @@ public class WeaponShoot : MonoBehaviour {
 					FireBullet ();
 				else if (weapon.ammoStockpile > 0)
 					StartReloading();
+				else if(!outOfAmmoPlayed)
+				{
+					outOfAmmoPlayed = true;
+					myCameraAudioSource.clip = outOfAmmoPhrases [Random.Range (0, outOfAmmoPhrases.Length)];
+					myCameraAudioSource.Play ();
+				}
 			}
 			else
 			{
@@ -161,7 +200,7 @@ public class WeaponShoot : MonoBehaviour {
 				ri.OnHover.Invoke();
 				interaction.text = ri.pickText;
 
-				if(Input.GetKey(KeyCode.E))
+				if(Input.GetKeyDown(KeyCode.E))
 				{
 					ri.OnPick.Invoke();
 				}
@@ -171,8 +210,13 @@ public class WeaponShoot : MonoBehaviour {
 
 	public void StartReloading()
 	{
-		reloading = true;
-		animator.SetBool ("Reloading", true);
+		if(!reloading)
+		{
+			reloading = true;
+			animator.SetBool ("Reloading", true);
+			myCameraAudioSource.clip = reloadingPhrases [Random.Range (0, reloadingPhrases.Length)];
+			myCameraAudioSource.Play ();
+		}
 	}
 
 	public void PlayClipOut()
@@ -187,6 +231,45 @@ public class WeaponShoot : MonoBehaviour {
 		myAudioSource.Play ();
 	}
 
+	void CheckChangeWeapons()
+	{
+		float d = Input.GetAxis("Mouse ScrollWheel");
+		if (d > 0f)
+		{
+			// scroll up
+			if(weaponIndex == weaponList.Length - 1)
+				weaponIndex = 0;
+			else weaponIndex++;
+		}
+		else if (d < 0f)
+		{
+			// scroll down
+			if(weaponIndex == 0)
+				weaponIndex = weaponList.Length - 1;
+			else 	weaponIndex--;
+		}
+
+		ChangeWeapon ();
+	}
+
+	void ChangeWeapon ()
+	{
+		//tell animator to switch
+		animator.SetInteger ("WeaponIndex", weaponIndex);
+		//turn shit off of old one
+		this.weapon.gameObject.active = false;
+		this.weapon.GetComponent<AudioSource> ().enabled = false;
+		this.weapon.enabled = false;
+		//change the weapons now
+		this.weapon = weaponList [weaponIndex];
+		//turn stuff on of new one
+		this.weapon.gameObject.active = true;
+		this.weapon.GetComponent<AudioSource> ().enabled = true;
+		this.weapon.enabled = true;
+		//reset the GUI so its for this weapon now
+		this.weapon.SetGUI ();
+	}
+
 	void FireBullet ()
 	{
 		GameObject muzF = (GameObject)GameObject.Instantiate (weapon.MuzzlePrefab, weapon.MuzzleTransform.position, weapon.MuzzleTransform.rotation);
@@ -198,10 +281,9 @@ public class WeaponShoot : MonoBehaviour {
 		Vector3 direction = this.transform.parent.transform.forward;
 		direction.Normalize ();
 		GameObject bul = (GameObject)GameObject.Instantiate (weapon.BulletPrefab, weapon.MuzzleTransform.position, weapon.MuzzleTransform.rotation);
-		bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + direction * 3f, direction * 1.6f);
-		myAudioSource.clip = weapon.FireNoise;
-		myAudioSource.Play ();
-
+		bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + direction, direction * 1.6f);
+		myCameraAudioSource.clip = weapon.FireNoise;
+		myAudioSource.PlayOneShot (myCameraAudioSource.clip);
 		weapon.currentClip--;
 		//raycasting
 		Ray ray = new Ray (this.transform.parent.position, this.transform.parent.forward);
@@ -227,9 +309,15 @@ public class WeaponShoot : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		if(isFiring)
+		if(outOfAmmoPlayed)
 		{
+			outOfAmmoTimer--;
 
+			if(outOfAmmoTimer == 0)
+			{
+				outOfAmmoTimer = outOfAmmoReset;
+				outOfAmmoPlayed = false;
+			}
 		}
 	}
 	

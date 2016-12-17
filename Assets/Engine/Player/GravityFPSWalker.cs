@@ -90,13 +90,17 @@ public class GravityFPSWalker: MonoBehaviour {
 
 	public AudioClip jumpNoise;
 	public AudioClip landNoise;
+	public AudioClip exhaustedNoise;
 	public AudioClip[] footNoises;
+	public AudioClip[] sprintNoises;
 
 	private bool isZooming = false;
 	private float zoomWalkAmount = .2f;
 	private float zoomIdleAmount = .1f;
 	private Image sprintUI;
 	private AudioSource myAudioSource;
+	//used for noises cause you cant play more than one at a time
+	private AudioSource myCameraAudioSource;
 	
 	void Start() {
 		controller = GetComponent<CharacterController>();
@@ -117,6 +121,7 @@ public class GravityFPSWalker: MonoBehaviour {
 		exhaustTimerReset = exhaustTimer;
 		sprintUI = GameObject.Find ("Canvas").transform.FindChild ("Sprintbar").GetComponent<Image> ();
 		myAudioSource = GetComponent<AudioSource> ();
+		myCameraAudioSource = this.transform.GetChild (0).GetComponent<AudioSource> ();
 	}
 
 	void SprintLogic ()
@@ -136,8 +141,20 @@ public class GravityFPSWalker: MonoBehaviour {
 		{
 			sprintJuice--;
 
+			if(sprintJuice % 30 == 0)
+			{
+				myCameraAudioSource.clip = sprintNoises[Random.Range(0, sprintNoises.Length)];
+				myCameraAudioSource.Play();
+			}
+
 			if (sprintJuice == 0) 
 			{
+				if(!exhausted)
+				{
+					//play exhausted noise
+					myCameraAudioSource.clip = exhaustedNoise;
+					myCameraAudioSource.Play();
+				}
 				exhausted = true;
 				sprinting = false;
 			}
@@ -178,7 +195,7 @@ public class GravityFPSWalker: MonoBehaviour {
 
 		eulerAngles += Vector3.right * inputY * tiltAmt;
 		eulerAngles += Vector3.up * inputX * tiltAmt;
-		eulerAngles += Vector3.right * inputX * tiltAmt;
+		//eulerAngles += Vector3.right * inputX * tiltAmt;
 
 		float euX = (Mathf.Clamp(eulerAngles.x ,-tiltMax, tiltMax));
 		float euY = (Mathf.Clamp(eulerAngles.y ,-tiltMax, tiltMax));
@@ -299,12 +316,12 @@ public class GravityFPSWalker: MonoBehaviour {
 		}
 
 		this.isZooming = isZooming;
-		animationPosition = Vector3.zero;
+		animationIdlePosition = Vector3.zero;
 		animationWalkingPosition = Vector3.zero;
 	}
 
 	[HideInInspector]
-	public Vector3 animationPosition;
+	public Vector3 animationIdlePosition;
 	[HideInInspector]
 	public Vector3 animationWalkingPosition;
 	[HideInInspector]
@@ -315,7 +332,7 @@ public class GravityFPSWalker: MonoBehaviour {
 	{
 		if (currentVehicle != null)
 		{
-			animationPosition = Vector3.zero;
+			animationIdlePosition = Vector3.zero;
 			animationWalkingPosition = Vector3.zero;
 			animationSprintingPosition = Vector3.zero;
 			IdleTimer = 0;
@@ -341,22 +358,22 @@ public class GravityFPSWalker: MonoBehaviour {
 			{
 				if(isZooming)
 				{
-					animationPosition += Vector3.up * idleAmount * zoomIdleAmount;
+					animationIdlePosition += Vector3.up * idleAmount * zoomIdleAmount;
 				}
 				else
 				{
-					animationPosition += Vector3.up * idleAmount;
+					animationIdlePosition += Vector3.up * idleAmount;
 				}
 			}
 			else
 			{
 				if(isZooming)
 				{
-					animationPosition -= Vector3.up * idleAmount * zoomIdleAmount;
+					animationIdlePosition -= Vector3.up * idleAmount * zoomIdleAmount;
 				}
 				else
 				{
-					animationPosition -= Vector3.up * idleAmount;
+					animationIdlePosition -= Vector3.up * idleAmount;
 				}
 			}
 
@@ -396,6 +413,8 @@ public class GravityFPSWalker: MonoBehaviour {
 					myAudioSource.Play();
 					walkCount++;
 				}
+				animationIdlePosition = Vector3.zero;
+				animationSprintingPosition = Vector3.zero;
 			}
 
 			lastPos = WalkTimer;
@@ -424,6 +443,8 @@ public class GravityFPSWalker: MonoBehaviour {
 					myAudioSource.Play();
 					sprintCount++;
 				}
+				animationIdlePosition = Vector3.zero;
+				animationWalkingPosition = Vector3.zero;
 			}
 			
 			lastSprintPos = SprintTimer;

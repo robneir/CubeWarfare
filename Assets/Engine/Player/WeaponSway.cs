@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class WeaponSway : MonoBehaviour {
@@ -39,7 +39,7 @@ public class WeaponSway : MonoBehaviour {
 		GUN.transform.Rotate (new Vector3 (-1, 0, 0) * Input.GetAxis("Vertical") * LateralAmount);
 		GUN.transform.localRotation = Quaternion.Lerp (GUN.transform.localRotation, DefaultRot, .15f);
 		GUN.transform.localPosition = Vector3.Lerp(GUN.transform.localPosition, 
-		                                           NewGunPos + gfp.animationPosition + gfp.animationWalkingPosition + gfp.animationSprintingPosition, 
+		                                           NewGunPos + gfp.animationIdlePosition + gfp.animationWalkingPosition + gfp.animationSprintingPosition, 
 		                                           MoveSpeed*Time.deltaTime);
 		//GUN.transform.localEulerAngles = Vector3.Lerp (GUN.transform.localEulerAngles, NewGunRot, MoveSpeed * Time.deltaTime);
 	}

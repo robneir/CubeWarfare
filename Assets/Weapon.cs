@@ -47,6 +47,7 @@ public class Weapon : MonoBehaviour {
 			currentClipText.text = _currentClip.ToString();
 		}
 	}
+	private AudioSource myAudioSource;
 	// Use this for initialization
 	void Start () 
 	{
@@ -60,6 +61,19 @@ public class Weapon : MonoBehaviour {
 		maxAmmo = ClipSize * 6;
 		ammoStockpile = ClipSize * 3;
 		FOVzoom = FOVzoom;
+		myAudioSource = GetComponent<AudioSource> ();
+	}
+
+	public void SetGUI()
+	{
+		currentClip = currentClip;
+		ammoStockpile = ammoStockpile;
+	}
+
+	public void PlayFireNoise()
+	{
+		myAudioSource.clip = FireNoise;
+		myAudioSource.PlayOneShot (myAudioSource.clip);
 	}
 	
 	// Update is called once per frame

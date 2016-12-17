@@ -9,6 +9,7 @@ public class AmmoBox : MonoBehaviour {
 	public AudioClip getNoise;
 	int howMuchAmmo = 0;
 	WeaponShoot whichWeapon;
+	AudioSource thisAudioSource;
 
 	public void SetHowMuch(int hm, WeaponShoot ww)
 	{
@@ -18,6 +19,8 @@ public class AmmoBox : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		thisP = GetComponent<Pickable> ();
+		thisAudioSource = GetComponent<AudioSource> ();
+		thisAudioSource.clip = getNoise;
 	}
 	
 	// Update is called once per frame
@@ -62,11 +65,12 @@ public class AmmoBox : MonoBehaviour {
 			}
 		}
 
-		AudioSource.PlayClipAtPoint (getNoise, this.transform.position);
-
 		if(Ammo <= 0)
 		{
-			GameObject.Destroy(this.gameObject);
+			thisAudioSource.Play ();
+			this.GetComponent<Renderer>().enabled =                                                                                                                                                                                                                                                                                                                                                           false;
+			GameObject.Destroy(this.gameObject, thisAudioSource.clip.length);
 		}
+		else thisAudioSource.Play();
 	}
 }
