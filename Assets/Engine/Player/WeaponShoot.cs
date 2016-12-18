@@ -299,10 +299,18 @@ public class WeaponShoot : MonoBehaviour {
 				Vector3 point = rh.point;
 				Quaternion rot = Quaternion.LookRotation(rh.normal);
 				GameObject ps = (GameObject)Instantiate(ri.onHitParticleSystem, point, rot);
+
+				Vector3 newBulletDir = rh.point - weapon.MuzzleTransform.position;
+				newBulletDir.Normalize();
+				bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + newBulletDir, newBulletDir * 1.6f);
 			}
 			else if(bp != null)
 			{
 				bp.DoDamage(rh.point, Quaternion.LookRotation(rh.normal), weapon.Damage, rh.collider.gameObject.name);
+
+				Vector3 newBulletDir = rh.point - weapon.MuzzleTransform.position;
+				newBulletDir.Normalize();
+				bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + newBulletDir, newBulletDir * 1.6f);
 			}
 		}
 	}
