@@ -58,4 +58,14 @@ public class WeaponSway : MonoBehaviour {
 	{
 		transform.parent.GetComponent<WeaponShoot> ().EndReloading ();
 	}
+
+	public void SetProjectileActive()
+	{
+		if(transform.parent.GetComponent<WeaponShoot>().weapon.FiresRigidbody)
+		{
+			transform.parent.GetComponent<WeaponShoot> ().weapon.MuzzleTransform.gameObject.active = true;
+			transform.parent.GetComponent<WeaponShoot> ().weapon.MuzzleTransform.gameObject.GetComponent<MeshRenderer> ().enabled = true;
+		}
+		else Debug.LogError("The current weapon does not shoot rigidbodies, so the rigidbody part of the gun cannot be turned back on.");
+	}
 }

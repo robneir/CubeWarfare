@@ -21,6 +21,7 @@ public class Weapon : MonoBehaviour {
 	public GameObject BulletPrefab;
 	public int Damage = 25;
 	public float FOVzoom = 10;
+	public bool FiresRigidbody = false;
 
 	//displaying clip info on GUI
 	private int _currentClip;
@@ -35,7 +36,13 @@ public class Weapon : MonoBehaviour {
 	public int ammoStockpile
 	{
 		get { return _ammoStockpile;}
-		set{ _ammoStockpile = value;
+		set
+		{ 
+			_ammoStockpile = value;
+
+			if(ammoStockpileText == null)
+				ammoStockpileText = GameObject.Find ("Canvas").transform.FindChild ("AmmoStockpile").GetComponent<Text>();
+
 			ammoStockpileText.text = _ammoStockpile.ToString();
 		}
 	}
@@ -43,7 +50,13 @@ public class Weapon : MonoBehaviour {
 	public int currentClip
 	{
 		get { return _currentClip;}
-		set{ _currentClip = value;
+		set
+		{ 
+			_currentClip = value;
+
+			if(currentClipText == null)
+				currentClipText = GameObject.Find ("Canvas").transform.FindChild ("AmmoClip").GetComponent<Text>();
+
 			currentClipText.text = _currentClip.ToString();
 		}
 	}

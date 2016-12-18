@@ -60,6 +60,7 @@
      <Compile Include="Assets\Engine\RaycastInfo.cs" />
      <Compile Include="Assets\Engine\Vehicle.cs" />
      <Compile Include="Assets\Engine\VehicleColliders.cs" />
+     <Compile Include="Assets\Rocket.cs" />
      <Compile Include="Assets\Weapon.cs" />
      <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />

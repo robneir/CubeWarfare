@@ -280,39 +280,76 @@ public class WeaponShoot : MonoBehaviour {
 		this.transform.Rotate (new Vector3 (-1, 0, 0) * weapon.RecoilRotation);
 		Vector3 direction = this.transform.parent.transform.forward;
 		direction.Normalize ();
-		GameObject bul = (GameObject)GameObject.Instantiate (weapon.BulletPrefab, weapon.MuzzleTransform.position, weapon.MuzzleTransform.rotation);
-		bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + direction, direction * 1.6f);
 		myCameraAudioSource.clip = weapon.FireNoise;
 		myAudioSource.PlayOneShot (myCameraAudioSource.clip);
 		weapon.currentClip--;
 		//raycasting
-		Ray ray = new Ray (this.transform.parent.position, this.transform.parent.forward);
-		RaycastHit rh;
-		bool isHit = Physics.Raycast (ray, out rh, 100000);
 
-		if(isHit)
+		//only raycast if we arent firing a rigidbody
+		if(!weapon.FiresRigidbody)
 		{
-			RaycastInfo ri = rh.collider.gameObject.GetComponent<RaycastInfo>();
-			BodyPart bp = rh.collider.gameObject.GetComponent<BodyPart>();
-			if(ri != null)
-			{
-				Vector3 point = rh.point;
-				Quaternion rot = Quaternion.LookRotation(rh.normal);
-				GameObject ps = (GameObject)Instantiate(ri.onHitParticleSystem, point, rot);
+			//make our aesthetic-only bullet 
+			GameObject bul = (GameObject)GameObject.Instantiate (weapon.BulletPrefab, weapon.MuzzleTransform.position, weapon.MuzzleTransform.rotation);
+			bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + direction, direction * 1.6f);
+			//create the actual ray - fires from center of camera instead of gun like the bullet does
+			Ray ray = new Ray (this.transform.parent.position, this.transform.parent.forward);
+			RaycastHit rh;
+			bool isHit = Physics.Raycast (ray, out rh, 100000);
 
-				Vector3 newBulletDir = rh.point - weapon.MuzzleTransform.position;
-				newBulletDir.Normalize();
-				bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + newBulletDir, newBulletDir * 1.6f);
-			}
-			else if(bp != null)
+			if(isHit)
 			{
-				bp.DoDamage(rh.point, Quaternion.LookRotation(rh.normal), weapon.Damage, rh.collider.gameObject.name);
+				RaycastInfo ri = rh.collider.gameObject.GetComponent<RaycastInfo>();
+				BodyPart bp = rh.collider.gameObject.GetComponent<BodyPart>();
+				if(ri != null)
+				{
+					Vector3 point = rh.point;
+					Quaternion rot = Quaternion.LookRotation(rh.normal);
+					GameObject ps = (GameObject)Instantiate(ri.onHitParticleSystem, point, rot);
 
-				Vector3 newBulletDir = rh.point - weapon.MuzzleTransform.position;
-				newBulletDir.Normalize();
-				bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + newBulletDir, newBulletDir * 1.6f);
+					Vector3 newBulletDir = rh.point - weapon.MuzzleTransform.position;
+					newBulletDir.Normalize();
+					bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + newBulletDir, newBulletDir * 1.6f);
+				}
+				else if(bp != null)
+				{
+					bp.DoDamage(rh.point, Quaternion.LookRotation(rh.normal), weapon.Damage, rh.collider.gameObject.name);
+
+					Vector3 newBulletDir = rh.point - weapon.MuzzleTransform.position;
+					newBulletDir.Normalize();
+					bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + newBulletDir, newBulletDir * 1.6f);
+				}
 			}
 		}
+		else
+		{
+			//we are using a rocket or something.
+			GameObject projectile = (GameObject)GameObject.Instantiate (weapon.BulletPrefab, weapon.MuzzleTransform.position, weapon.MuzzleTransform.rotation);
+			projectile.GetComponent<Rocket> ().Init (direction, 1);
+
+			//tell the "Rocket" part on the gun to become inactive, since we just shot it
+			weapon.MuzzleTransform.gameObject.active = false;
+			weapon.MuzzleTransform.gameObject.GetComponent<MeshRenderer>().enabled = false;
+
+			//now we need to raycast to see if the user is pointing at a wall - in which case it should fire towards the wall
+			Ray ray = new Ray (this.transform.parent.position, this.transform.parent.forward);
+			RaycastHit rh;
+			bool isHit = Physics.Raycast (ray, out rh, 100000);
+			//if we have hit something, adjust the trajectory of the projectile
+			if(isHit)
+			{
+				RaycastInfo ri = rh.collider.gameObject.GetComponent<RaycastInfo>();
+				if(ri != null)
+				{
+					Vector3 newBulletDir = rh.point - weapon.MuzzleTransform.position;
+					newBulletDir.Normalize();
+					projectile.GetComponent<Rocket> ().Init (newBulletDir, 1);
+				}
+			}
+		}
+
+		//check if we should / can reload
+		if (weapon.currentClip == 0 && weapon.ammoStockpile > 0)
+			StartReloading();
 	}
 
 	void FixedUpdate()

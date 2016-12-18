@@ -1,12 +1,14 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Engine\Player\GravityFPSWalker.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Engine\Player\WeaponShoot.cs">
     <Files>
-      <File FileName="Assets\Weapon.cs" Line="35" Column="26" />
+      <File FileName="Cube Warfare.sln" Line="1" Column="1" />
+      <File FileName="Assets\Engine\Player\WeaponShoot.cs" Line="341" Column="71" />
+      <File FileName="Assets\Weapon.cs" Line="24" Column="37" />
       <File FileName="Assets\Engine\Vehicle.cs" Line="1" Column="1" />
-      <File FileName="Assets\Engine\Player\WeaponShoot.cs" Line="35" Column="25" />
       <File FileName="Assets\Engine\AmmoBox.cs" Line="1" Column="1" />
-      <File FileName="Assets\Engine\Player\GravityFPSWalker.cs" Line="234" Column="28" />
+      <File FileName="Assets\Engine\Player\GravityFPSWalker.cs" Line="1" Column="1" />
+      <File FileName="Assets\Rocket.cs" Line="41" Column="50" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
