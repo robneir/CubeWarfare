@@ -78,6 +78,12 @@ public class WeaponShoot : MonoBehaviour {
 		{
 			zooming = !zooming;
 			reticle.gameObject.active = !zooming;
+			if(!zooming && weapon.GUIZoom)
+			{
+				weapon.GUIZoomImage.gameObject.active = false;
+				weapon.SetVisible(true);
+				this.transform.GetChild(0).GetChild(1).GetComponent<SkinnedMeshRenderer>().enabled = true;
+			}
 			gfps.SetZooming(zooming);
 		}
 
@@ -148,6 +154,14 @@ public class WeaponShoot : MonoBehaviour {
 
 			gunCam.fieldOfView = Mathf.Lerp(gunCam.fieldOfView, weapon.FOVzoom, .1f);
 			worldCam.fieldOfView = Mathf.Lerp(worldCam.fieldOfView, weapon.FOVzoom, .1f);
+
+			//for snipers
+			if(weapon.GUIZoom && gunCam.fieldOfView <= weapon.FOVzoom + 2.5f)
+			{
+				weapon.GUIZoomImage.gameObject.active = true;
+				weapon.SetVisible(false);
+				this.transform.GetChild(0).GetChild(1).GetComponent<SkinnedMeshRenderer>().enabled = false;
+			}
 		}
 		else
 		{
@@ -309,6 +323,14 @@ public class WeaponShoot : MonoBehaviour {
 					Vector3 newBulletDir = rh.point - weapon.MuzzleTransform.position;
 					newBulletDir.Normalize();
 					bul.GetComponent<Bullet> ().Set (weapon.MuzzleTransform.position, weapon.MuzzleTransform.position + newBulletDir, newBulletDir * 1.6f);
+
+					DestructablePiece dp = rh.collider.gameObject.GetComponent<DestructablePiece>();
+					//see if it is descturctable
+					if(dp != null)
+					{
+						Destructable d = rh.collider.gameObject.transform.root.GetComponent<Destructable>();
+						d.Activate(400, point, 80);
+					}
 				}
 				else if(bp != null)
 				{

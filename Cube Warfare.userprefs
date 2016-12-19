@@ -1,14 +1,17 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Engine\Player\WeaponShoot.cs">
     <Files>
-      <File FileName="Cube Warfare.sln" Line="1" Column="1" />
-      <File FileName="Assets\Engine\Player\WeaponShoot.cs" Line="341" Column="71" />
-      <File FileName="Assets\Weapon.cs" Line="24" Column="37" />
+      <File FileName="Cube Warfare.sln" Line="52" Column="8" />
+      <File FileName="Assets\Engine\Player\WeaponShoot.cs" Line="329" Column="20" />
+      <File FileName="Assets\Weapon.cs" Line="1" Column="1" />
       <File FileName="Assets\Engine\Vehicle.cs" Line="1" Column="1" />
       <File FileName="Assets\Engine\AmmoBox.cs" Line="1" Column="1" />
       <File FileName="Assets\Engine\Player\GravityFPSWalker.cs" Line="1" Column="1" />
-      <File FileName="Assets\Rocket.cs" Line="41" Column="50" />
+      <File FileName="Assets\Rocket.cs" Line="34" Column="4" />
+      <File FileName="Assets\Engine\Player\WeaponSway.cs" Line="1" Column="1" />
+      <File FileName="Assets\Destructable.cs" Line="31" Column="42" />
+      <File FileName="Assets\DestructablePiece.cs" Line="4" Column="49" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

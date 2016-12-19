@@ -22,6 +22,8 @@ public class Weapon : MonoBehaviour {
 	public int Damage = 25;
 	public float FOVzoom = 10;
 	public bool FiresRigidbody = false;
+	public bool GUIZoom = false;
+	public Image GUIZoomImage;
 
 	//displaying clip info on GUI
 	private int _currentClip;
@@ -87,6 +89,16 @@ public class Weapon : MonoBehaviour {
 	{
 		myAudioSource.clip = FireNoise;
 		myAudioSource.PlayOneShot (myAudioSource.clip);
+	}
+
+	public void SetVisible (bool visible)
+	{
+		MeshRenderer[] rends = this.gameObject.GetComponentsInChildren<MeshRenderer> ();
+
+		foreach(var mr in rends)
+		{
+			mr.enabled = visible;
+		}
 	}
 	
 	// Update is called once per frame

@@ -45,6 +45,8 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Destructable.cs" />
+     <Compile Include="Assets\DestructablePiece.cs" />
      <Compile Include="Assets\Engine\AmmoBox.cs" />
      <Compile Include="Assets\Engine\BodyPart.cs" />
      <Compile Include="Assets\Engine\Bullet.cs" />

@@ -31,6 +31,11 @@ public class Rocket : MonoBehaviour {
 		}
 		else
 		{
+			if(c.gameObject.GetComponent<DestructablePiece>() != null)
+			{
+				Destructable d = c.gameObject.transform.root.GetComponent<Destructable>();
+				d.Activate(10000, this.transform.position, 100);
+			}
 			GameObject.Destroy(this.gameObject);
 			GameObject.Destroy((GameObject)GameObject.Instantiate(explosion, this.transform.position, this.transform.rotation), 5f);
 		}
